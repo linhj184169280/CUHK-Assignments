@@ -1,0 +1,6 @@
+./mountains/goodimg_1.tga   ./mountains/1.key
+./mountains/goodimg_2.tga   ./mountains/2.key
+./mountains/goodimg_3.tga   ./mountains/3.key
+./mountains/goodimg_4.tga   ./mountains/4.key
+./mountains/goodimg_5.tga   ./mountains/5.key
+./mountains/goodimg_6.tga   ./mountains/6.key
