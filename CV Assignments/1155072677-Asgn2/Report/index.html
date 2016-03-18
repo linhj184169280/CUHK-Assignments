@@ -1,0 +1,138 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>Automatic Panoramic Mosaic Stitc</title>
+</head>
+
+<body>
+
+<h1 align="center"><font face="Times New Roman"><strong>Automatic Panoramic 
+Mosaic Stitching</strong></font></h1>
+<p align="center">Name: Lin Huangjing&nbsp;&nbsp;&nbsp; Student ID: 1155072677</p>
+<h2 align="left"><u><font face="Times New Roman">1. Introduction</font></u></h2>
+<p align="left"><font face="Times New Roman" size="4">In this project, I utilize 
+the technology based on computer vision to stitch the given images, and create a 
+panorama view of it. The procedure can be divided into three parts: Correction 
+of Radial Distortion , Global Alignment of Images and Blending Images. </font>
+</p>
+<p align="left"><font face="Times New Roman" size="4">This report is organized 
+as follow: In Section 1, the outline of image stitching and report organization 
+are introduced. In Section 2, I will introduce the details of the stitching 
+methods and how these methods are implemented. In Section 3, the results of my 
+project will be illustrated.</font></p>
+<h2 align="left"><u><font face="Times New Roman">2. Method</font></u></h2>
+<p align="left"><font face="Times New Roman" size="4">The main procedure of 
+stitching are images alignment and blending. However, because of the inevitable 
+distortion caused by camera, we should correct the radial distortion before the 
+images being aligned. After then, in the alignment part, features are extracted 
+and matched properly, which provide the useful information of feature matches 
+for image stitching. Finally, based on the alignments created in the step 2, 
+images are stitched one by one to create the final results.</font></p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.1 
+Correction of Radial Distortion</b></p>
+<p align="left"><font face="Times New Roman" size="4">To correct the radial 
+distortion, I used a simple polynomial transformation proposed by mathematician 
+Philipp Ludwig Von Seidel. As we know, the simplified model of radial distortion 
+is:</font></p>
+<p align="center">
+<img border="0" src="WebSource/Fig1.jpg" width="348" height="120"></p>
+<p align="left"><font size="4" face="Times New Roman">we can get the 
+corresponding transformation coordinates (x,y) in undistorted image is:</font></p>
+<p align="center">
+<img border="0" src="WebSource/Fig2.jpg" width="214" height="73"></p>
+<p align="left"><font face="Times New Roman" size="4">by implementing this model 
+directly, I get the corrected results needed in the following steps.</font></p>
+<p align="left"><font face="Times New Roman" size="4">(Ps: The code of this part 
+is implemented in the file: <i>WarpSpherical.cpp</i>; routine: <i>WarpRDField</i> 
+)</font></p>
+<h2 align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.2
+</b><span style="font-family: Arial; font-size: 19px; letter-spacing: normal">
+Global Alignment of Images</span></h2>
+<p align="left"><font face="Times New Roman" size="4">In this part, the 
+stitching relationship and feature matches among images are determined. Firstly 
+SIFT[1] is used as definition of features and Euclidean Distance is used as 
+definition of feature distance. Before alignment of the images, I compare the 
+feature arrays of images two by two, use a matrix to represent the combination 
+among the images and find out which of them are fittest to stitch together.
+</font></p>
+<h2 align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.2.1
+<span style="font-weight: 400">Finding out Accurate Feature Matches between Two 
+Images</span></b></h2>
+<p align="left"><font face="Times New Roman" size="4">Many feature matches are 
+preserved after matching, but not all of them are accurate. Here, I selected 
+accurate matches via RANdom SAmple Consensus[2] (RANSAC). This approach is 
+implemented by calculating the least-square fit of features. The definition is 
+as follow:</font></p>
+<p align="center">
+<img border="0" src="WebSource/eq3.jpg" width="396" height="31"></p>
+<p align="center">
+<img border="0" src="WebSource/Fig3.jpg" width="392" height="65"></p>
+<p align="left">
+<font class="ws12" style="font-size: 16px; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+<i>p</i></font><span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 13px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none">i</span><font class="ws12" style="font-size: 16px; color: rgb(0, 0, 0); font-family: Arial; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">’ 
+and <i>p</i></font><span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 13px; font-style: normal; font-variant: normal; font-weight: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px; display: inline !important; float: none">i
+</span><font size="4" face="Times New Roman">are two feature pairs. This is an 
+iterative procedure and R is calculated by SVD. After that, we can get the 
+number of accurate feature matches and marked them into a Matrix.</font></p>
+<p align="left"><font face="Times New Roman" size="4">(Ps: The code of this part 
+is implemented in the file: <i>FeatureAlign.cpp</i>; routines: <i>alignImagePair</i>,
+<i>countInliers</i>, and <i>leastSquaresFit</i>)</font></p>
+<p align="left"><b>
+<span style="font-family: Arial; font-size: 19px; letter-spacing: normal">2</span></b><span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px"><b>.2.2</b> 
+Calculating Global Alignment</span></p>
+<p align="left"><font face="Times New Roman" size="4">By the RANSAC method in we 
+define, I initial the Global Alignment among the images. And then transform all 
+the images in a common plane. I stitch the images one by one via selecting the 
+strongest match every time.</font></p>
+<p align="left"><font face="Times New Roman" size="4">(Ps: The code of this part 
+is implemented in the file: <i>GlobalAlign.cpp</i>; routine: <i>initGlobalAlign</i>)</font></p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.3 
+Blending Images</b></p>
+<p align="left"><font face="Times New Roman" size="4">In this part, we blend all 
+the images by inverse mapping. The locations in panorama of each image pixel are 
+calculated by a transformation. This transformation is defined as follow:</font></p>
+<p align="center">
+<img border="0" src="WebSource/Fig4.jpg" width="192" height="207"></p>
+<p align="left"><font size="4" face="Times New Roman">Calculating by this, we 
+can get the transformed coordinates (x, y) in the panorama. And then blend 
+images together and get the final results.</font></p>
+<h2 align="left">3.<strong><u><font face="Times New Roman">Experimental Results</font></u></strong></h2>
+<p align="left">
+<b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+3.1 Mountains</b></p>
+<p align="center">
+<img border="0" src="WebSource/Fig6_mountains.jpg" width="843" height="379"></p>
+<p align="left"><font face="Times New Roman" size="4">The result is decent.</font></p>
+<p align="left">
+<b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+3.2 Piazzanavona</b></p>
+<p align="center">
+<img border="0" src="WebSource/Fig7_Piazzanavona.jpg" width="862" height="209"></p>
+<p align="left"><font size="4"><span style="font-family: Times New Roman">There 
+exists some mis-matching problems to be solved.</span></font></p>
+<p align="left"><font size="4"><span style="font-family: Times New Roman">The 
+link of 360 degree panorama: <a href="360_Degree_Pizzanavona/ENGG5104.html">
+Piazzanavona</a></span></font></p>
+<p align="left">
+<b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+3.3 </b><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">Lobby</span></b></span></p>
+<p align="center"><font size="4" face="Times New Roman">&nbsp;<img border="0" src="WebSource/Fig8_Lobby.jpg" width="879" height="318"></font></p>
+<p align="left"><font size="4"><span style="font-family: Times New Roman">The 
+link of 360 degree panorama: <a href="360_Degree_Lobby/ENGG5104.html">Lobby</a></span></font></p>
+<h2><font face="Times New Roman"><u>References</u></font></h2>
+<p><font size="4" face="Times New Roman">[1] Richard Szeliski and Heung-Yeung 
+Shum. <i>Creating Full View Panoramic Image Mosaics and Environment Maps.</i> 
+SIGGRAPH97</font></p>
+<p><font size="4" face="Times New Roman">[2] Brown, M. Hartley, R.I. Nister, D.
+<i>Minimal Solutions for Panoramic Stitching.</i> CVPR07</font></p>
+
+</body>
+
+</html>
