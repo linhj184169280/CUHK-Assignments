@@ -1,0 +1,180 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="zh-cn">
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<title>Pedestrian Detection</title>
+</head>
+
+<body>
+
+<h1 align="center"><strong><font face="Times New Roman">Pedestrian Detection</font></strong></h1>
+<p align="center">Name: Lin Huangjing&nbsp;&nbsp;&nbsp; Student ID: 1155072677</p>
+<h2 align="left"><u><font face="Times New Roman">1. Introduction</font></u></h2>
+<p align="left"><font face="Times New Roman" size="4">Pedestrian is one of the 
+most challenging task in the field of computer vision. In this assignment, I 
+will apply histogram of gradient (HOG) as descriptor and linear SVM as detector 
+to fulfill this task.</font></p>
+<p align="left"><font face="Times New Roman" size="4">The framework of detection 
+is implemented based on the theory of image pyramid. The pedestrians in 
+different images have different resolutions. So a image pyramid is built up in 
+variety resolutions to find out pedestrians in different size. A trained SVM is 
+used to convolve every image in the pyramid, scoring the different patches 
+located in it. </font></p>
+<p align="left"><font face="Times New Roman" size="4">The technical details of 
+this project can be divided into two main part: (1) HOG descriptor[1][2], which 
+is used to represent training and testing samples; (2) SVM detection, which is 
+used to evaluate the score of how each sample may contain pedestrian. </font>
+</p>
+<p align="left"><font face="Times New Roman" size="4">This report is organized 
+as follow: In Section 1, the outline of pedestrian detection task is introduced. 
+In Section 2, I will introduce the details of the methods and how these methods 
+are implemented. In Section 3, the results of the project will be illustrated.</font></p>
+<h2 align="left"><u><font face="Times New Roman">2. Method</font></u></h2>
+<p align="left"><font face="Times New Roman" size="4">The pedestrian detection 
+frame work of this project can be see in Figure 1 as follow:</font></p>
+<p align="center">
+<img border="0" src="html/Framework.jpg" width="792" height="254"></p>
+<p align="center">Fig 1. Main Framework</p>
+<p align="left"><font face="Times New Roman" size="4">First of all, the patches 
+are extracted from the detected image via a sliding window. And then, the 
+patches are constructed into vectors by HOG method. After that, a trained SVM is 
+used to value the probability of patches, and give scores of detecting. Finally, 
+pick out the scores higher than the threshold, and write down their coordinates 
+to generate the final results. The HOG descriptor and SVM detection are two main 
+parts of this project.</font></p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.1 
+HOG Descriptor</b></p>
+<p align="left"><font face="Times New Roman" size="4">A patch are transformed by 
+HOG[3] via three procedures: (1) Compute angle and magnitude of gradient, (2) 
+Construct HOG for each cell, and (3) Construct the normalized HOG for each 
+block. (As Fig. 2 show)</font></p>
+<p align="center">
+<img border="0" src="html/Flow%20of%20HOG.jpg" width="551" height="91"></p>
+<p align="center">Fig 2. Flow of HOG Descriptor</p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.1.1
+</b>
+<span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+Compute Angle and Magnitude of Gradient</p>
+</span>
+<p align="left"><font face="Times New Roman" size="4">Firstly, the direction and 
+the magnitude of gradient should be calculated. The direction is represented by 
+an angle. The fundamental concept of Laplacian Gradient is implemented to 
+compute the gradient. I implemented this part by two convolutional operations to 
+generate calculate <i>dx, dy</i> of every pixel respectively. And then, combine
+<i>dx, dy</i> to calculate the angles and magnitudes that we need. The equation 
+of angle and magnitude are showed in the Figure 3.</font></p>
+<p align="center">
+<img border="0" src="html/Gradient%20Equation.jpg" width="311" height="118"></p>
+<p align="center">Fig 3. Equations of Angle and Magnitude of Gradient</p>
+<p align="left"><font face="Times New Roman" size="4">The Flow of computation is 
+as follow:</font></p>
+<p align="center">
+<img border="0" src="html/Flow%20of%20Laplacian%20Gradient.jpg" width="688" height="244"></p>
+<p align="center">Fig 4. Flow of Computation of Laplacian Gradient</p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.1.2
+</b>
+<span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+Construct HOG for each cell</p>
+</span>
+<p align="left"><font face="Times New Roman" size="4">In this part, the size of 
+cell is fixed to cover 8x8 pixels. The direction space from [-π, π] is divided 
+into 9 part, corresponding to 9 bins. Every bin represents the statistic 
+information of magnitudes in different directions. </font></p>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.1.3
+</b>
+<span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+Construct Normalized HOG for Each Block</p>
+</span>
+<p align="left"><font face="Times New Roman" size="4">In this part, cells are 
+organized into block. Each block contains 2x2 cells and will be flatted into a 
+vector. It means that every block vectors is in dimension of 9(bins) * 
+(2*2)(cells) * = 36. To get better results, I implements the normalization by
+<font color="#FF0000"><b>L2-Hys</b></font> regulation, which improved the 
+results in a large scale. The formulation of <font color="#FF0000"><b>L2-Hys</b></font> 
+is defined as follow:</font></p>
+<p align="center"><img border="0" src="index.1.jpg"></p>
+<p align="center">Fig 5. Definition of L2-Hys</p>
+<h2 align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.2 
+SVM Detection</b></h2>
+<p align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.2.1
+</b>
+<span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+Sliding Window Strategy</p>
+</span>
+<p align="left"><font face="Times New Roman" size="4">Detection procedure uses 
+sliding window strategy. A sliding window is used to detect patches of image and 
+a score map is returned as its result. Take a 256x256x36 HOG descriptor and a 
+15x7x36 trained detector as example. The 36-dimension HOG descriptor and 
+detector are split in 36 channels firstly. And then convolutional operations are 
+implemented in single channel separately, and finally, they are added up 
+together to generate the final score map. The procedure are described in the 
+Figure 6 as follow:</font></p>
+<p align="center">
+<img border="0" src="html/Score%20Map.jpg" width="522" height="347"></p>
+<p align="center">Fig 6. Calculation of Score Map</p>
+<p align="left">　</p>
+<h2 align="left"><span style="font-size: 19px; letter-spacing: normal"><b>
+<span style="font-family: Arial">2</span></b></span><b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">.2.2
+<span style="font-weight: 400">Select Score by Threshold and Compute Bounding 
+Box</span></b></h2>
+<p align="left"><font face="Times New Roman" size="4">After score map 
+calculating, the blocks are selected by a threshold. If its score is higher than 
+threshold, the coordinates of the box will be calculated and store in the 
+cv::Mat bbox. </font></p>
+<p align="left"><font face="Times New Roman" size="4">The calculation of box 
+coordinates is given as follows:</font></p>
+<p align="center">
+<img border="0" src="html/Box%20coordinates.jpg" width="486" height="128"></p>
+<p align="center">Fig 7. Calculation of Box Coordinates</p>
+<p align="left"><font face="Times New Roman" size="4">Finally, the boxes 
+calculated from different images of pyramid will be collected together and be 
+used for final presentation.</font></p>
+<p align="left"><b>
+<span style="font-family: Arial; font-size: 19px; letter-spacing: normal">2</span></b><span style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px"><b>.2.3</b> 
+Build Image Pyramid</span></p>
+<p align="left"><font face="Times New Roman" size="4">In order to detect the 
+pedestrian in different resolution, the original image are resized into 
+different resolution and pushed into a image pyramid. In this part, resize 
+function of OpenCV is used. The level of my pyramid is 3. The scales of 
+corresponding levels are 0.21,0.27 and 0.3 respectively. </font></p>
+<h2 align="left">3.<strong><u><font face="Times New Roman">Experimental Results</font></u></strong></h2>
+<p align="left"><font face="Times New Roman" size="4">In the experimental part, 
+the parameter of my method are set as follow:</font></p>
+<p align="left"><font face="Times New Roman" size="4">scale = [0.21, 0.27, 0.3],</font></p>
+<p align="left"><font face="Times New Roman" size="4">threshold = [1.5, 1.55, 
+1.6],</font></p>
+<p align="left"><font face="Times New Roman" size="4">overlap ration is 0.2</font></p>
+<p align="left">
+<b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+3.1 Accuracy</b></p>
+<p align="left"><font face="Times New Roman" size="4">The average precision (AP) 
+of my method on the validation data is about 0.57 [4][5]. </font></p>
+<p align="center"><img border="0" src="html/AP.jpg" width="560" height="420"></p>
+<p align="center">Fig 6. Average Precision</p>
+<p align="center">　</p>
+<p align="left">
+<b style="color: rgb(0, 0, 0); font-family: Arial; font-size: 19px; font-style: normal; font-variant: normal; letter-spacing: normal; line-height: normal; orphans: auto; text-align: start; text-indent: 0px; text-transform: none; white-space: normal; widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px">
+3.2 Detection Demonstration</b></p>
+<p align="left">
+<img border="0" src="html/Result%201.jpg" width="403" height="644"><img border="0" src="html/Result%202.jpg" width="463" height="647"><img border="0" src="html/Result%205.jpg" width="514" height="640"></p>
+<p align="left">
+<img border="0" src="html/Result%203.jpg" width="639" height="640"><img border="0" src="html/Result%206.jpg" width="628" height="643"></p>
+<h2><font face="Times New Roman"><u>References</u></font></h2>
+<p><font size="5">[1]. HOG tutorial. http://chrisjmccormick.wordpress.com/2013/05/09/hog-person-detector-tutorial/<br>
+[2]. HOG introduction. http://en.wikipedia.org/wiki/Histogram_of_oriented_gradients<br>
+[3]. N.Dalal and B.Triggs. &lt;&lt;Histograms of Oriented Gradients for Human 
+Detection&gt;&gt;, CVPR 2013.<br>
+[4]. Precision and recall. http://en.wikipedia.org/wiki/Precision_and_recall<br>
+[5]. Average precision. 
+http://en.wikipedia.org/wiki/Information_retrieval#Average_precision</font></p>
+
+</body>
+
+</html>
