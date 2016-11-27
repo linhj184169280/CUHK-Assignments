@@ -1,2 +1,3 @@
 # CUHK-Assignments
-This is my CUHK Assignments repository
+
+This is my CUHK Assignments repository.
