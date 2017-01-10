@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImageLib", "ImageLib\ImageLib.vcproj", "{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "project2", "project2.vcproj", "{968112E8-4636-4FAC-BBFA-220228A4605E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E} = {827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}.Debug.ActiveCfg = Release|Win32
+		{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}.Debug.Build.0 = Release|Win32
+		{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}.Release.ActiveCfg = Release|Win32
+		{827608E3-E930-4B4E-A5A8-24EFDC6EAC9E}.Release.Build.0 = Release|Win32
+		{968112E8-4636-4FAC-BBFA-220228A4605E}.Debug.ActiveCfg = Debug|Win32
+		{968112E8-4636-4FAC-BBFA-220228A4605E}.Debug.Build.0 = Debug|Win32
+		{968112E8-4636-4FAC-BBFA-220228A4605E}.Release.ActiveCfg = Release|Win32
+		{968112E8-4636-4FAC-BBFA-220228A4605E}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
